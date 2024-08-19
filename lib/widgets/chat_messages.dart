@@ -1,4 +1,6 @@
+import 'package:chat_app/widgets/message_bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatMessages extends StatelessWidget {
@@ -9,7 +11,7 @@ class ChatMessages extends StatelessWidget {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('chat')
-          .orderBy('createdAt', descending: false)
+          .orderBy('createdAt', descending: true)
           .snapshots(),
       builder: (ctx, chatSnapshot) {
         if (chatSnapshot.connectionState == ConnectionState.waiting) {
@@ -17,7 +19,7 @@ class ChatMessages extends StatelessWidget {
             child: CircularProgressIndicator(),
           );
         }
-        if(!chatSnapshot.hasData || chatSnapshot.data!.docs.isEmpty) {
+        if (!chatSnapshot.hasData || chatSnapshot.data!.docs.isEmpty) {
           return const Center(
             child: Text('No messages found, start sending messages!'),
           );
@@ -36,9 +38,33 @@ class ChatMessages extends StatelessWidget {
           ),
           reverse: true,
           itemCount: chatDocs?.length,
-          itemBuilder: (ctx, index) => ListTile(
-            title: Text(chatDocs![index]['text']),
-          ),
+          itemBuilder: (ctx, index) {
+            final currentMessage = chatDocs?[index];
+            final nextMessage = index + 1 < chatDocs!.length
+                ? chatDocs[index + 1]
+                : null;
+
+            final currentUserId = currentMessage?['userId'];
+            final nextUserId = nextMessage?['userId'];
+
+            final isSameUser = currentUserId == nextUserId;
+
+            if (isSameUser) {
+              return MessageBubble.next(
+                message: currentMessage?['text'],
+                isMe: currentMessage?['userId'] ==
+                    FirebaseAuth.instance.currentUser!.uid,
+              );
+            } else {
+              return MessageBubble.first(
+                userImage: currentMessage?['userImage'],
+                username: currentMessage?['username'],
+                message: currentMessage?['text'],
+                isMe: currentMessage?['userId'] ==
+                    FirebaseAuth.instance.currentUser!.uid,
+              );
+            }
+          },
         );
       },
     );
