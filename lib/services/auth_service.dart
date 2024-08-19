@@ -17,25 +17,21 @@ class AuthService {
     }
   }
 
-  Future<void> signUp(
-    String email, 
-    String password, 
-    File? image, 
-    Function(bool) onUploading, 
-    String username
-  ) async {
+  Future<void> signUp(String email, String password, File? image,
+      Function(bool) onUploading, String username) async {
     if (image == null) {
       throw Exception('An image must be selected to sign up.');
     }
 
     try {
-      UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       // Iniciar la subida de la imagen
-      onUploading(true); 
+      onUploading(true);
 
       final ref = FirebaseStorage.instance
           .ref()
@@ -53,8 +49,11 @@ class AuthService {
         'username': username,
         'email': email,
         'image_url': imageUrl,
+      }).then((_) {
+        print('User data saved in Firestore successfully.');
+      }).catchError((error) {
+        print('Failed to save user data: $error');
       });
-
     } on FirebaseAuthException catch (e) {
       throw _handleAuthError(e);
     } finally {

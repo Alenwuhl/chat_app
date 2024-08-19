@@ -57,7 +57,7 @@ class _AuthScreenState extends State<AuthScreen> {
               _isUploading = isUploading;
             });
           },
-          _username // Pasamos el username al servicio
+          _username
         );
       }
     } catch (error) {
