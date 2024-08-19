@@ -35,8 +35,16 @@ This application was developed for personal practice and does not focus on sophi
    flutter pub get
 3. Set up Firebase for your project by following the official documentation.
 4. Run the application:
- ```bash
-   flutter run
+    ```bash
+      flutter run
+
+## Contributions
+Contributions are not the main focus of this project, but feel free to submit a pull request or report issues if you find something that can be improved.
+
+## License
+This project does not have a specific license and was created solely for practice purposes.
+
+
 
 
 
